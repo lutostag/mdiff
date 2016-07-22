@@ -1,0 +1,25 @@
+#!/usr/bin/python2
+import sys
+from collections import defaultdict
+
+
+with sys.stdin as lines:
+    diff = [line for line in lines]
+
+def undiff_line(line_number):
+    diff[line_number] = ' ' + diff[line_number].lstrip('-+')
+
+added = defaultdict(list)
+removed = defaultdict(list)
+for index, line in enumerate(diff):
+    if line.startswith('+') and not line.startswith('+++'):
+        added[line.replace('+', '', 1).strip()].append(index)
+    if line.startswith('-') and not line.startswith('---'):
+        removed[line.replace('-', '', 1).strip()].append(index)
+
+for added_line in added:
+    while len(removed[added_line]) > 0 and len(added[added_line]) > 0:
+        undiff_line(added[added_line].pop())
+        undiff_line(removed[added_line].pop())
+
+print(''.join(diff))
